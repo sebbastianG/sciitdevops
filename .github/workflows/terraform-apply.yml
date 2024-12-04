@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is deploying on AWS 🚀
 on:
   push:
     branches: 
-      feature/aws-s3-module
+      - feature/aws-s3-module
 jobs:
   Deploy-AWS-Ec2:
     runs-on: ubuntu-latest
@@ -16,10 +16,9 @@ jobs:
           aws-region: eu-central-1
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Deploy Infrastructure
-      - run: |
-            cd /terraform/terraform-modules/tf-ec2-module/
-      - run: |
-            terraform init
-      - run: |
-            terraform apply -auto-approve
+      - name: Change to Terraform directory
+        run: cd /terraform/terraform-modules/tf-ec2-module/
+      - name: Initialize Terraform
+        run: terraform init
+      - name: Apply Terraform configuration
+        run: terraform apply -auto-approve
