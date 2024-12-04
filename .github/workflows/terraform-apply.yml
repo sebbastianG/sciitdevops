@@ -16,8 +16,8 @@ jobs:
           aws-region: eu-central-1
       - name: Deploy Infrastructure
       - run: |
-          cd /terraform/terraform-modules/tf-ec2-module/
+            cd /terraform/terraform-modules/tf-ec2-module/
       - run: |
-          terraform init
+            terraform init
       - run: |
-          terraform apply -auto-approve
+            terraform apply -auto-approve
