@@ -20,4 +20,4 @@ jobs:
         run: |
           cd terraform/terraform-modules/tf-ec2-module/
           terraform init
-          terraform apply -auto-approve
+          terraform destroy -auto-approve
