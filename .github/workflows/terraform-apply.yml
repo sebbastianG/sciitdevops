@@ -16,11 +16,8 @@ jobs:
           aws-region: eu-central-1
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Change to Terraform directory
-        run: cd "terraform/terraform-modules/tf-ec2-module/"
-      - name: Show working directory
-        run: ls -all
-      - name: Initialize Terraform
-        run: terraform init
-      - name: Apply Terraform configuration
-        run: terraform apply -auto-approve
+      - name: Deploy Infrastructure
+        run: |
+          cd terraform/terraform-modules/tf-ec2-module/
+          terraform init
+          terraform apply -auto-approve
