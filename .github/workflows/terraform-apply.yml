@@ -17,7 +17,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Change to Terraform directory
-        run: cd /terraform/terraform-modules/tf-ec2-module/
+        run: cd terraform/terraform-modules/tf-ec2-module/
       - name: Initialize Terraform
         run: terraform init
       - name: Apply Terraform configuration
