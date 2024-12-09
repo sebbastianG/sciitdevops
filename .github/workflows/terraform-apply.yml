@@ -17,7 +17,7 @@ jobs:
       - name: Read User Mapping
         id: user-mapping
         run: |
-          user_mapping=$(cat user-mapping.json)
+          user_mapping=$(cat .github/workflows/user-mapping.json)
           github_actor=${{ github.actor }}
           user_data=$(echo $user_mapping | jq -r ".[$github_actor]")
 
