@@ -20,10 +20,10 @@ jobs:
       - name: List .github/workflows directory
         run: ls -la .github/workflows
 
-      - name: Read User Mapping
+      - name: Read User Mapping (Improved)
         id: user-mapping
         run: |
-          USER_MAPPING=$(cat .github/workflows/user-mapping.json)
+          USER_MAPPING=$(secrets.USER_MAPPING_JSON) # Assuming stored as a GitHub Secret
           USER_CREDENTIALS=$(jq -r --arg USERNAME "$GITHUB_ACTOR" '.[$USERNAME]' <<< "$USER_MAPPING")
           echo "::set-output name=user-mapping::${USER_CREDENTIALS}"
 
@@ -31,12 +31,12 @@ jobs:
         run: echo "${{ steps.user-mapping.outputs.user-mapping }}"
 
       # Step 0.1: Set AWS credentials
-      - name: Set AWS Credentials
+      - name: Set AWS Credentials (Simplified)
         run: |
-          USER_MAPPING=$(cat .github/workflows/user-mapping.json)
-          USER_CREDENTIALS=$(jq -r --arg USERNAME "$GITHUB_ACTOR" '.[$USERNAME]' <<< "$USER_MAPPING")
-          echo "AWS_SECRET_ACCESS_KEY=$(echo "$USER_CREDENTIALS" | jq -r '.AWS_SECRET_ACCESS_KEY')" >> $GITHUB_ENV
-          echo "AWS_SECRET_KEY_ID=$(echo "$USER_CREDENTIALS" | jq -r '.AWS_SECRET_KEY_ID')" >> $GITHUB_ENV
+          USER_CREDENTIALS=$(echo "${{ steps.user-mapping.outputs.user-mapping }}" | jq -r '.AWS_SECRET_ACCESS_KEY')
+          echo "AWS_SECRET_ACCESS_KEY=$USER_CREDENTIALS" >> $GITHUB_ENV
+          USER_CREDENTIALS=$(echo "${{ steps.user-mapping.outputs.user-mapping }}" | jq -r '.AWS_SECRET_KEY_ID')
+          echo "AWS_SECRET_KEY_ID=$USER_CREDENTIALS" >> $GITHUB_ENV
 
       # Step 1: Configure AWS credentials
       - name: Configure AWS credentials
