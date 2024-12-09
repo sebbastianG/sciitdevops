@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       #Step 0: Read user mapping
+      - name: List .github/workflows directory
+        run: ls -la .github/workflows
+
       - name: Read User Mapping
         id: user-mapping
         run: |
