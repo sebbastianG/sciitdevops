@@ -24,7 +24,7 @@ jobs:
         id: user-mapping
         run: |
           USER_MAPPING=$(cat .github/workflows/user-mapping.json)
-          echo "::set-output name=user-mapping::$USER_MAPPING"
+          echo "::set-output name=user-mapping::$(echo "$USER_MAPPING" | jq -r '.[$GITHUB_ACTOR]')"
 
       - name: Print user mapping
         run: echo "${{ steps.user-mapping.outputs.user-mapping }}"
