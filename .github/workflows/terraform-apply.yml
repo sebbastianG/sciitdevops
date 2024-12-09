@@ -12,7 +12,7 @@ jobs:
       - name: Read User Mapping
         id: user-mapping
         run: |
-          USER_MAPPING=$(cat user-mapping.json)
+          USER_MAPPING=$(cat .github/workflows/user-mapping.json)
           echo "::set-output name=user-mapping::$USER_MAPPING"
 
       # Step 0.1: Set AWS credentials
