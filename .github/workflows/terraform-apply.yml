@@ -9,6 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       #Step 0: Read user mapping
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List root directory
+        run: ls -la
+
       - name: List .github/workflows directory
         run: ls -la .github/workflows
 
