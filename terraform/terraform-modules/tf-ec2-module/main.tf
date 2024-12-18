@@ -22,6 +22,34 @@ resource "aws_instance" "web" {
 
   tags = merge(local.common_tags, { Name = "WebServer" })
 
-  user_data = file("python_web_server.sh")
+  #user_data = file("python_web_server.sh")
+   # Use the remote-exec provisioner to run the setup script
+  provisioner "file" {
+    source      = "python_web_server.sh"
+    destination = "/home/ec2-user/python_web_server.sh"
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = tls_private_key.private_key.private_key_openssh # Path to your private key
+      host        = self.public_ip
+    }
+
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod +x /home/ec2-user/python_web_server.sh",
+      "/home/ec2-user/python_web_server.sh"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = tls_private_key.private_key.private_key_openssh # Path to your private key
+      host        = self.public_ip
+    }
+  }
 }
+
 
