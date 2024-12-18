@@ -1,6 +1,6 @@
 # main.tf
 provider "aws" {
-  region = "eu-central-1"
+  region = "eu-west-1"
 }
 
 # Local backend for initial setup
@@ -12,7 +12,6 @@ terraform {
 
 resource "aws_s3_bucket" "terraform_state_bucket" {
   bucket        = "terraform-state-${terraform.workspace}"
-  acl           = "private"
   force_destroy = true # For simplicity in training scenarios; remove in production.
 
   tags = {
@@ -38,5 +37,5 @@ output "backend_config" {
 }
 
 variable "region" {
-  default = "eu-central-1"
+  default = "eu-west-1"
 }

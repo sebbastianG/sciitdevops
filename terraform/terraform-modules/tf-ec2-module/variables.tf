@@ -1,13 +1,13 @@
 variable "region" {
   description = "The AWS region to deploy resources in"
   type        = string
-  default     = "eu-central-1"
+  default     = "eu-west-1"
 }
 
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC"
   type        = string
-  default     = "10.0.0.0/16"
+  default     = "10.0.0.0/22"
 }
 
 variable "public_subnet_cidr" {
@@ -25,28 +25,40 @@ variable "private_subnet_cidr" {
 variable "public_subnet_az" {
   description = "The availability zone for the public subnet"
   type        = string
-  default     = "eu-central-1a"
+  default     = "eu-west-1a"
 }
 
 variable "private_subnet_az" {
   description = "The availability zone for the private subnet"
   type        = string
-  default     = "eu-central-1b"
+  default     = "eu-west-1b"
 }
 
-variable "owner" {
-  description = "Owner of the resources"
-  type        = string
-}
+# variable "owner" {
+#   description = "Owner of the resources"
+#   type        = string
+# }
 
-variable "name" {
-  description = "Environment name"
-  type        = string
-}
+# variable "name" {
+#   description = "Environment name"
+#   type        = string
+# }
 
 variable "extra_tags" {
   description = "Additional tags to apply to resources"
   type        = map(string)
   default     = {}
+}
+
+variable "vpc_name" {
+  description = "VPC name"
+  type        = string
+  default     = "VPC_DevOps"
+}
+
+variable "sg_name" {
+  description = "SG name"
+  type        = string
+  default     = "sg_devops"
 }
 

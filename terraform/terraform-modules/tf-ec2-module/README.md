@@ -18,7 +18,7 @@ We create an outputs.tf file to get information about created resources and we f
 
 4. Deploy Infrastructure:
 • Run the following Terraform commands:
--  terraform init to initialize the working directory.
+- terraform init to initialize the working directory.
 - terraform plan to review the execution plan.
 - terraform apply to deploy the infrastructure.
 
