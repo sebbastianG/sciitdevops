@@ -22,8 +22,8 @@ pipeline {
                     echo "Executing Terraform on VM..."
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
                     cd ~/git-repo/sciitdevops/terraform
-                    /snap/bin/terraform init
-                    /snap/bin/terraform apply -auto-approve
+                    terraform init
+                    terraform apply -auto-approve
                     EOF
                     '''
                 }
