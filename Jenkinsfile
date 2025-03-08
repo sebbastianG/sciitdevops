@@ -11,18 +11,26 @@ pipeline {
         }
         stage('Terraform Init & Apply') {
             steps {
-                sh '''
-                cd terraform
-                terraform init
-                terraform apply -auto-approve
-                '''
+                sshagent(['terraform-ssh']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no jenkins@192.168.1.12 << EOF
+                    cd ~/git-repo/sciitdevops/terraform
+                    terraform init
+                    terraform apply -auto-approve
+                    EOF
+                    '''
+                }
             }
         }
         stage('Ansible Configuration') {
             steps {
-                sh '''
-                ansible-playbook -i inventory ansible/setup.yml
-                '''
+                sshagent(['terraform-ssh']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no jenkins@192.168.1.12 << EOF
+                    ansible-playbook -i ~/git-repo/sciitdevops/inventory ~/git-repo/sciitdevops/ansible/setup.yml
+                    EOF
+                    '''
+                }
             }
         }
         stage('Build and Deploy App') {
