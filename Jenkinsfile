@@ -11,9 +11,9 @@ pipeline {
         }
         stage('Terraform Init & Apply') {
             steps {
-                sshagent(['terraform-ssh']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no jenkins@192.168.1.12 << EOF
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
                     cd ~/git-repo/sciitdevops/terraform
                     terraform init
                     terraform apply -auto-approve
@@ -24,9 +24,9 @@ pipeline {
         }
         stage('Ansible Configuration') {
             steps {
-                sshagent(['terraform-ssh']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no jenkins@192.168.1.12 << EOF
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
                     ansible-playbook -i ~/git-repo/sciitdevops/inventory ~/git-repo/sciitdevops/ansible/setup.yml
                     EOF
                     '''
