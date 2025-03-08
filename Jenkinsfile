@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git credentialsId: "${GIT_CREDENTIALS_ID}", url: 'https://github.com/YOUR_USERNAME/sciitdevops.git', branch: 'main'
+                git credentialsId: "${GIT_CREDENTIALS_ID}", url: 'https://github.com/sebastianG/sciitdevops.git', branch: 'main'
             }
         }
         stage('Terraform Init & Apply') {
