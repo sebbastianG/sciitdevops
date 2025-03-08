@@ -11,26 +11,18 @@ pipeline {
         }
         stage('Terraform Init & Apply') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
-                    cd ~/git-repo/sciitdevops/terraform
-                    terraform init
-                    terraform apply -auto-approve
-                    EOF
-                    '''
-                }
+                sh '''
+                cd terraform
+                terraform init
+                terraform apply -auto-approve
+                '''
             }
         }
         stage('Ansible Configuration') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
-                    ansible-playbook -i ~/git-repo/sciitdevops/inventory ~/git-repo/sciitdevops/ansible/setup.yml
-                    EOF
-                    '''
-                }
+                sh '''
+                ansible-playbook -i inventory ansible/setup.yml
+                '''
             }
         }
         stage('Build and Deploy App') {
