@@ -42,12 +42,11 @@ pipeline {
 
                     echo "Checking Terraform Modules..."
                     if [ ! -d "terraform-modules/tf-s3-modules" ]; then
-                        echo "Terraform module directory not found! Exiting."
-                        exit 1
+                        echo "Cloning missing Terraform module..."
+                        mkdir -p terraform-modules
+                        cd terraform-modules
+                        git clone https://github.com/sebbastianG/sciitdevops-modules.git tf-s3-modules
                     fi
-
-                    echo "Fixing Terraform Module Source..."
-                    sed -i 's|git::https://github.com/mihai-satmarean/sciitdevops/blob/main/terraform/terraform-modules/tf-s3-modules/|../terraform-modules/tf-s3-modules|' s3.tf
 
                     echo "Initializing Terraform..."
                     rm -rf .terraform
