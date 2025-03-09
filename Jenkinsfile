@@ -34,7 +34,10 @@ pipeline {
 
         stage('Fix Terraform Module & Apply') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([
+                    usernamePassword(credentialsId: 'GIT_CREDENTIALS_ID', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS'),
+                    sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')
+                ]) {
                     sh '''
                     echo "Fixing Terraform Module Path..."
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
@@ -45,7 +48,13 @@ pipeline {
                         echo "Cloning missing Terraform module..."
                         mkdir -p terraform-modules
                         cd terraform-modules
-                        git clone https://github.com/sebbastianG/sciitdevops-modules.git tf-s3-modules
+                        git clone https://$GIT_USER:$GIT_PASS@github.com/sebbastianG/tf-s3-modules.git
+                    fi
+
+                    echo "Verifying Terraform Configuration..."
+                    if [ ! -f "main.tf" ]; then
+                        echo "Terraform main.tf is missing! Exiting."
+                        exit 1
                     fi
 
                     echo "Initializing Terraform..."
