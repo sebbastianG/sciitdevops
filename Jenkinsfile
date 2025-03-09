@@ -35,7 +35,7 @@ pipeline {
         stage('Fix Terraform Module & Apply') {
             steps {
                 withCredentials([
-                    usernamePassword(credentialsId: 'GIT_CREDENTIALS_ID', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS'),
+                    usernamePassword(credentialsId: '285c1afd-abfb-4f4e-a55a-6dbb10b9ed65', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS'),
                     sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')
                 ]) {
                     sh '''
@@ -48,13 +48,7 @@ pipeline {
                         echo "Cloning missing Terraform module..."
                         mkdir -p terraform-modules
                         cd terraform-modules
-                        git clone https://$GIT_USER:$GIT_PASS@github.com/sebbastianG/tf-s3-modules.git
-                    fi
-
-                    echo "Verifying Terraform Configuration..."
-                    if [ ! -f "main.tf" ]; then
-                        echo "Terraform main.tf is missing! Exiting."
-                        exit 1
+                        git clone https://$GIT_USER:$GIT_PASS@github.com/sebbastianG/sciitdevops-modules.git tf-s3-modules
                     fi
 
                     echo "Initializing Terraform..."
