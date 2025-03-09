@@ -32,7 +32,7 @@ pipeline {
             }
         }
 
-        stage('Fix Terraform Module Path & Apply') {
+        stage('Fix Terraform Module & Apply') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
@@ -40,8 +40,14 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
                     cd ~/git-repo/sciitdevops/terraform || exit 1
 
+                    echo "Checking Terraform Modules..."
+                    if [ ! -d "terraform-modules/tf-s3-modules" ]; then
+                        echo "Terraform module directory not found! Exiting."
+                        exit 1
+                    fi
+
                     echo "Fixing Terraform Module Source..."
-                    sed -i 's|git::https://github.com/mihai-satmarean/sciitdevops/blob/main/terraform/terraform-modules/tf-s3-modules/|git::https://github.com/sebbastianG/sciitdevops.git//terraform/terraform-modules/tf-s3-modules|' s3.tf
+                    sed -i 's|git::https://github.com/mihai-satmarean/sciitdevops/blob/main/terraform/terraform-modules/tf-s3-modules/|../terraform-modules/tf-s3-modules|' s3.tf
 
                     echo "Initializing Terraform..."
                     rm -rf .terraform
