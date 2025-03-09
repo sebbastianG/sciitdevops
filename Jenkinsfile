@@ -18,7 +18,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST "echo SSH connected"
 
                     echo "Cloning repository on VM..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST <<EOF
                     mkdir -p ~/git-repo
                     cd ~/git-repo
                     if [ ! -d "sciitdevops" ]; then
@@ -28,6 +28,7 @@ pipeline {
                         git reset --hard
                         git pull origin main
                     fi
+                    exit 0
                     EOF
                     '''
                 }
@@ -39,10 +40,11 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                     echo "Running Terraform on VM..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST <<EOF
                     cd ~/git-repo/sciitdevops/terraform || exit 1
                     terraform init
                     terraform apply -auto-approve
+                    exit 0
                     EOF
                     '''
                 }
@@ -54,9 +56,14 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                     echo "Executing Ansible Playbook..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST <<EOF
                     cd ~/git-repo/sciitdevops/ansible
-                    ansible-playbook -i inventory setup.yml || echo "Ansible Playbook not found"
+                    if [ -f setup.yml ]; then
+                        ansible-playbook -i inventory setup.yml
+                    else
+                        echo "Ansible Playbook not found! Skipping."
+                    fi
+                    exit 0
                     EOF
                     '''
                 }
@@ -68,10 +75,11 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                     echo "Building and Deploying App..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST <<EOF
                     cd ~/git-repo/sciitdevops
                     docker build -t my-weather-app:latest .
                     kubectl apply -f kubernetes/deployment.yaml
+                    exit 0
                     EOF
                     '''
                 }
