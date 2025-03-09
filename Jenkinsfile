@@ -39,7 +39,9 @@ pipeline {
                     echo "Executing Terraform on VM..."
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
                     cd ~/git-repo/sciitdevops/terraform || exit 1
-                    terraform init
+                    echo "Updating Terraform Modules..."
+                    rm -rf .terraform
+                    terraform init -upgrade
                     terraform apply -auto-approve
                     exit 0
                     EOF
@@ -52,8 +54,14 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
+                    echo "Executing Ansible Playbook on VM..."
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
-                    ansible-playbook -i ~/git-repo/sciitdevops/inventory ~/git-repo/sciitdevops/ansible/setup.yml
+                    if [ -f ~/git-repo/sciitdevops/ansible/setup.yml ]; then
+                        ansible-playbook -i ~/git-repo/sciitdevops/inventory ~/git-repo/sciitdevops/ansible/setup.yml
+                    else
+                        echo "Ansible playbook not found! Skipping."
+                        exit 1
+                    fi
                     exit 0
                     EOF
                     '''
@@ -63,19 +71,39 @@ pipeline {
 
         stage('Build and Deploy App') {
             steps {
-                sh '''
-                echo "Building Docker Image..."
-                docker build -t my-weather-app:latest .
+                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                    echo "Ensuring Docker is installed..."
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
+                    if ! command -v docker &> /dev/null; then
+                        echo "Docker is missing. Installing..."
+                        sudo apt update
+                        sudo apt install -y docker.io
+                    fi
+                    docker --version
+                    EOF
 
-                echo "Deploying to Kubernetes..."
-                kubectl apply -f kubernetes/deployment.yaml
-                '''
+                    echo "Building Docker Image..."
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
+                    cd ~/git-repo/sciitdevops
+                    docker build -t my-weather-app:latest .
+                    EOF
+
+                    echo "Deploying to Kubernetes..."
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
+                    kubectl apply -f ~/git-repo/sciitdevops/kubernetes/deployment.yaml
+                    EOF
+                    '''
+                }
             }
         }
 
         stage('Trigger ArgoCD Sync') {
             steps {
-                sh 'argocd app sync my-weather-app'
+                sh '''
+                echo "Triggering ArgoCD Sync..."
+                argocd app sync my-weather-app
+                '''
             }
         }
     }
