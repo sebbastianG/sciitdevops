@@ -7,6 +7,7 @@ spec:
     app: weather-app
   ports:
     - protocol: TCP
-      port: 80
+      port: 5000       # Change this from 80 to 5000
       targetPort: 5000
-  type: ClusterIP
+      nodePort: 30007  # Choose a free port in range 30000-32767
+  type: NodePort       # Change from ClusterIP to NodePort
