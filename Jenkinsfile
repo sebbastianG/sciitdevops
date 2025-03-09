@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         GIT_CREDENTIALS_ID = '285c1afd-abfb-4f4e-a55a-6dbb10b9ed65'
+        ARGOCD_SERVER = 'argo.example.com' // Change to your ArgoCD server address
     }
     stages {
         stage('Clone Repository on VM') {
@@ -35,7 +36,7 @@ pipeline {
         stage('Fix Terraform Module & Apply') {
             steps {
                 withCredentials([
-                    usernamePassword(credentialsId: '285c1afd-abfb-4f4e-a55a-6dbb10b9ed65', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS'),
+                    usernamePassword(credentialsId: 'GIT_CREDENTIALS_ID', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS'),
                     sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')
                 ]) {
                     sh '''
@@ -112,10 +113,15 @@ pipeline {
 
         stage('Trigger ArgoCD Sync') {
             steps {
-                sh '''
-                echo "Triggering ArgoCD Sync..."
-                argocd app sync my-weather-app
-                '''
+                withCredentials([string(credentialsId: 'argocd-token', variable: 'ARGOCD_AUTH_TOKEN')]) {
+                    sh '''
+                    echo "Logging into ArgoCD..."
+                    argocd login $ARGOCD_SERVER --insecure --username admin --password $ARGOCD_AUTH_TOKEN
+                    
+                    echo "Triggering ArgoCD Sync..."
+                    argocd app sync my-weather-app
+                    '''
+                }
             }
         }
     }
