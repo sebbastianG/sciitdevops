@@ -15,7 +15,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 "echo SSH connected"
 
                     echo "Cloning repository on VM..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
                     mkdir -p ~/git-repo
                     cd ~/git-repo
                     if [ ! -d "sciitdevops" ]; then
@@ -25,6 +25,7 @@ pipeline {
                         git reset --hard
                         git pull origin main
                     fi
+                    exit 0
                     EOF
                     '''
                 }
@@ -36,10 +37,11 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                     echo "Executing Terraform on VM..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
                     cd ~/git-repo/sciitdevops/terraform || exit 1
                     terraform init
                     terraform apply -auto-approve
+                    exit 0
                     EOF
                     '''
                 }
@@ -50,8 +52,9 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << EOF
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
                     ansible-playbook -i ~/git-repo/sciitdevops/inventory ~/git-repo/sciitdevops/ansible/setup.yml
+                    exit 0
                     EOF
                     '''
                 }
