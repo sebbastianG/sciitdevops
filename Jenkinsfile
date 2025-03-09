@@ -32,14 +32,18 @@ pipeline {
             }
         }
 
-        stage('Terraform Init & Apply') {
+        stage('Fix Terraform Module Path & Apply') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    echo "Executing Terraform on VM..."
+                    echo "Fixing Terraform Module Path..."
                     ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
                     cd ~/git-repo/sciitdevops/terraform || exit 1
-                    echo "Updating Terraform Modules..."
+
+                    echo "Fixing Terraform Module Source..."
+                    sed -i 's|git::https://github.com/mihai-satmarean/sciitdevops/blob/main/terraform/terraform-modules/tf-s3-modules/|git::https://github.com/sebbastianG/sciitdevops.git//terraform/terraform-modules/tf-s3-modules|' s3.tf
+
+                    echo "Initializing Terraform..."
                     rm -rf .terraform
                     terraform init -upgrade
                     terraform apply -auto-approve
