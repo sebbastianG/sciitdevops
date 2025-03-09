@@ -1,81 +1,62 @@
 pipeline {
     agent any
+
     environment {
         GIT_CREDENTIALS_ID = '285c1afd-abfb-4f4e-a55a-6dbb10b9ed65'
-        ARGOCD_SERVER = 'argo.example.com' // Change to your ArgoCD server address
+        SSH_CREDENTIALS_ID = 'terraform-ssh'
+        REPO_URL = 'https://github.com/sebbastianG/sciitdevops.git'
+        VM_USER = 'jenkins'
+        VM_HOST = '192.168.1.12'
     }
+
     stages {
         stage('Clone Repository on VM') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    echo "Checking SSH key..."
-                    ls -lah $SSH_KEY
-                    
                     echo "Testing SSH Connection..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 "echo SSH connected"
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST "echo SSH connected"
 
                     echo "Cloning repository on VM..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
                     mkdir -p ~/git-repo
                     cd ~/git-repo
                     if [ ! -d "sciitdevops" ]; then
-                        git clone https://github.com/sebbastianG/sciitdevops.git
+                        git clone $REPO_URL
                     else
                         cd sciitdevops
                         git reset --hard
                         git pull origin main
                     fi
-                    exit 0
                     EOF
                     '''
                 }
             }
         }
 
-        stage('Fix Terraform Module & Apply') {
+        stage('Run Terraform') {
             steps {
-                withCredentials([
-                    usernamePassword(credentialsId: 'GIT_CREDENTIALS_ID', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS'),
-                    sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')
-                ]) {
+                withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    echo "Fixing Terraform Module Path..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
+                    echo "Running Terraform on VM..."
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
                     cd ~/git-repo/sciitdevops/terraform || exit 1
-
-                    echo "Checking Terraform Modules..."
-                    if [ ! -d "terraform-modules/tf-s3-modules" ]; then
-                        echo "Cloning missing Terraform module..."
-                        mkdir -p terraform-modules
-                        cd terraform-modules
-                        git clone https://$GIT_USER:$GIT_PASS@github.com/sebbastianG/sciitdevops-modules.git tf-s3-modules
-                    fi
-
-                    echo "Initializing Terraform..."
-                    rm -rf .terraform
-                    terraform init -upgrade
+                    terraform init
                     terraform apply -auto-approve
-                    exit 0
                     EOF
                     '''
                 }
             }
         }
 
-        stage('Ansible Configuration') {
+        stage('Run Ansible') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    echo "Executing Ansible Playbook on VM..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
-                    if [ -f ~/git-repo/sciitdevops/ansible/setup.yml ]; then
-                        ansible-playbook -i ~/git-repo/sciitdevops/inventory ~/git-repo/sciitdevops/ansible/setup.yml
-                    else
-                        echo "Ansible playbook not found! Skipping."
-                        exit 1
-                    fi
-                    exit 0
+                    echo "Executing Ansible Playbook..."
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
+                    cd ~/git-repo/sciitdevops/ansible
+                    ansible-playbook -i inventory setup.yml || echo "Ansible Playbook not found"
                     EOF
                     '''
                 }
@@ -84,42 +65,14 @@ pipeline {
 
         stage('Build and Deploy App') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'terraform-ssh', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    echo "Ensuring Docker is installed..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
-                    if ! command -v docker &> /dev/null; then
-                        echo "Docker is missing. Installing..."
-                        sudo apt update
-                        sudo apt install -y docker.io
-                    fi
-                    docker --version
-                    EOF
-
-                    echo "Building Docker Image..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
+                    echo "Building and Deploying App..."
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY $VM_USER@$VM_HOST << 'EOF'
                     cd ~/git-repo/sciitdevops
                     docker build -t my-weather-app:latest .
+                    kubectl apply -f kubernetes/deployment.yaml
                     EOF
-
-                    echo "Deploying to Kubernetes..."
-                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY jenkins@192.168.1.12 << 'EOF'
-                    kubectl apply -f ~/git-repo/sciitdevops/kubernetes/deployment.yaml
-                    EOF
-                    '''
-                }
-            }
-        }
-
-        stage('Trigger ArgoCD Sync') {
-            steps {
-                withCredentials([string(credentialsId: 'argocd-token', variable: 'ARGOCD_AUTH_TOKEN')]) {
-                    sh '''
-                    echo "Logging into ArgoCD..."
-                    argocd login $ARGOCD_SERVER --insecure --username admin --password $ARGOCD_AUTH_TOKEN
-                    
-                    echo "Triggering ArgoCD Sync..."
-                    argocd app sync my-weather-app
                     '''
                 }
             }
