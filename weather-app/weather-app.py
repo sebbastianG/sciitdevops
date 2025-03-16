@@ -1,40 +1,28 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, render_template
 import requests
 
 app = Flask(__name__)
 
-API_KEY = "8957568db7e84747c64e6d1de15f637b"  # Replace with a valid OpenWeatherMap API Key
+API_KEY = "8957568db7e84747c64e6d1de15f637b"
 WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather"
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET", "POST"])
 def home():
-    return """
-        <h2>Enter City Name</h2>
-        <form action='/weather' method='get'>
-            <input type='text' name='city' placeholder='City'>
-            <button type='submit'>Get Weather</button>
-        </form>
-    """
+    weather = None
+    city = None
 
-@app.route("/weather", methods=["GET"])
-def get_weather():
-    city = request.args.get("city")
-    if not city:
-        return jsonify({"error": "City parameter is required"}), 400
+    if request.method == "POST":
+        city = request.form.get("city")
+        if city:
+            params = {"q": city, "appid": API_KEY, "units": "metric"}
+            response = requests.get(WEATHER_API_URL, params=params)
 
-    params = {"q": city, "appid": API_KEY, "units": "metric"}
-    response = requests.get(WEATHER_API_URL, params=params)
+            if response.status_code == 200:
+                weather = response.json()
+            else:
+                weather = {"error": "City not found"}
 
-    if response.status_code == 200:
-        weather = response.json()
-        return f"""
-            <h3>Weather in {city}:</h3>
-            <p>Temperature: {weather['main']['temp']}°C</p>
-            <p>Condition: {weather['weather'][0]['description']}</p>
-            <a href="/">Back</a>
-        """
-    else:
-        return "<h3>City not found</h3><a href='/'>Back</a>"
+    return render_template("index.html", weather=weather, city=city)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
