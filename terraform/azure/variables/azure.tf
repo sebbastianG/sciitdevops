@@ -18,15 +18,14 @@ variable "azure_tenant_id" {
   description = "Azure Tenant ID"
 }
 
-# ✅ Add the missing variables for resource group
-variable "weather_app_resource_group_location" {
-  type        = string
-  description = "Azure region where the Weather App resource group is created"
-}
-
 variable "weather_app_resource_group_name" {
   type        = string
   description = "Resource group name for Weather App"
+}
+
+variable "weather_app_resource_group_location" {
+  type        = string
+  description = "Azure region where the Weather App resource group is created"
 }
 
 variable "vm_admin_username" {
