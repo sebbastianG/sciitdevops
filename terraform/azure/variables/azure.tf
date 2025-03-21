@@ -1,18 +1,39 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "azure_subscription_id" {
   type        = string
-  default     = "West Europe"
+  description = "Azure Subscription ID"
 }
 
-variable "environment" {
-  description = "Environment name"
+variable "azure_client_id" {
   type        = string
-  default     = "dev"
+  description = "Azure Client ID"
 }
 
-variable "project" {
-  description = "Project name"
+variable "azure_client_secret" {
   type        = string
-  default     = "devops-tools"
+  description = "Azure Client Secret"
 }
 
+variable "azure_tenant_id" {
+  type        = string
+  description = "Azure Tenant ID"
+}
+
+variable "resource_group_location" {
+  type        = string
+  description = "Azure region where the resource group is created"
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "Resource group name"
+}
+
+variable "vm_admin_username" {
+  type        = string
+  description = "Admin username for the VM"
+}
+
+variable "ssh_public_key" {
+  type        = string
+  description = "SSH Public Key for VM login"
+}
