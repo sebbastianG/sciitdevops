@@ -20,12 +20,7 @@ jobs:
         working-directory: terraform/azure
 
       - name: Terraform Plan
-        run: |
-          terraform plan \
-            -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-            -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
-            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+        run: terraform plan -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
         working-directory: terraform/azure
         env:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -34,12 +29,7 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Terraform Apply
-        run: |
-          terraform apply -auto-approve \
-            -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-            -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
-            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+        run: terraform apply -auto-approve -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
         working-directory: terraform/azure
         env:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
