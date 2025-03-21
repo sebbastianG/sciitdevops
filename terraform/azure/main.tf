@@ -1,14 +1,10 @@
-resource "random_pet" "rg_name" {
-  prefix = var.resource_group_name_prefix
-}
-
 resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group_name
   location = var.resource_group_location
-  name     = random_pet.rg_name.id
 }
 
-# Create virtual machine for k3s
-resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
+# Create a virtual machine for k3s
+resource "azurerm_linux_virtual_machine" "k3s_vm" {
   name                  = "k3svm"
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
@@ -28,21 +24,17 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     version   = "latest"
   }
 
-  computer_name  = "hostname"
-  admin_username = var.username
+  computer_name  = "k3svm"
+  admin_username = var.vm_admin_username
 
   admin_ssh_key {
-    username   = var.username
-    public_key = azapi_resource_action.ssh_public_key_gen.output.publicKey
-  }
-
-  boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
+    username   = var.vm_admin_username
+    public_key = var.ssh_public_key
   }
 }
 
-# Create virtual machine for observability
-resource "azurerm_linux_virtual_machine" "my_terraform_vm_2" {
+# Create a virtual machine for observability
+resource "azurerm_linux_virtual_machine" "observability_vm" {
   name                  = "observabilityvm"
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
@@ -62,15 +54,11 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm_2" {
     version   = "latest"
   }
 
-  computer_name  = "hostname"
-  admin_username = var.username
+  computer_name  = "observabilityvm"
+  admin_username = var.vm_admin_username
 
   admin_ssh_key {
-    username   = var.username
-    public_key = azapi_resource_action.ssh_public_key_gen.output.publicKey
-  }
-
-  boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
+    username   = var.vm_admin_username
+    public_key = var.ssh_public_key
   }
 }
