@@ -1,7 +1,7 @@
 resource "azurerm_network_security_group" "my_terraform_nsg" {
   name                = "myNetworkSecurityGroup"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.weather_app_rg.location
+  resource_group_name = azurerm_resource_group.weather_app_rg.name
 
   security_rule {
     name                       = "SSH"
@@ -18,8 +18,8 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
 
 resource "azurerm_network_interface" "my_terraform_nic" {
   name                = "myNIC"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.weather_app_rg.location
+  resource_group_name = azurerm_resource_group.weather_app_rg.name
 
   ip_configuration {
     name                          = "my_nic_configuration"
@@ -38,17 +38,17 @@ resource "azurerm_network_interface_security_group_association" "example" {
 resource "random_id" "random_id" {
   keepers = {
     # Generate a new ID only when a new resource group is defined
-    resource_group = azurerm_resource_group.rg.name
+    resource_group = azurerm_resource_group.weather_app_rg.name
   }
 
   byte_length = 8
 }
 
-# Create storage account for boot diagnostics
-resource "azurerm_storage_account" "my_storage_account" {
-  name                     = "diag${random_id.random_id.hex}"
-  location                 = azurerm_resource_group.rg.location
-  resource_group_name      = azurerm_resource_group.rg.name
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
+# Create storage account for boot diagnostics (Now Removed)
+# resource "azurerm_storage_account" "my_storage_account" {
+#   name                     = "diag${random_id.random_id.hex}"
+#   location                 = azurerm_resource_group.weather_app_rg.location
+#   resource_group_name      = azurerm_resource_group.weather_app_rg.name
+#   account_tier             = "Standard"
+#   account_replication_type = "LRS"
+# }
