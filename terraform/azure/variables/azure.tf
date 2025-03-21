@@ -18,22 +18,20 @@ variable "azure_tenant_id" {
   description = "Azure Tenant ID"
 }
 
+# ✅ Add the missing variables for resource group
 variable "weather_app_resource_group_location" {
   type        = string
   description = "Azure region where the Weather App resource group is created"
-  default     = "Central India"
 }
 
 variable "weather_app_resource_group_name" {
   type        = string
   description = "Resource group name for Weather App"
-  default     = "weather-app-rg"
 }
 
 variable "vm_admin_username" {
   type        = string
   description = "Admin username for the VM"
-  default     = "sebastian"
 }
 
 variable "ssh_public_key" {
