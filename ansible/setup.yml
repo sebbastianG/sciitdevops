@@ -1,0 +1,7 @@
+- name: Configure Kubernetes Node
+  hosts: localhost
+  tasks:
+    - name: Install dependencies
+      apt:
+        name: ["docker.io", "kubectl"]
+        state: present
