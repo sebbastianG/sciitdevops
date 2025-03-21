@@ -1,13 +1,14 @@
-resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group_name
-  location = var.resource_group_location
+# Create Resource Group for the Weather App
+resource "azurerm_resource_group" "weather_app_rg" {
+  name     = var.weather_app_resource_group_name
+  location = var.weather_app_resource_group_location
 }
 
-# Create a virtual machine for k3s
+# Create Virtual Machine for K3s
 resource "azurerm_linux_virtual_machine" "k3s_vm" {
   name                  = "k3svm"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
+  location              = azurerm_resource_group.weather_app_rg.location
+  resource_group_name   = azurerm_resource_group.weather_app_rg.name
   network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
   size                  = "Standard_DS1_v2"
 
@@ -33,11 +34,11 @@ resource "azurerm_linux_virtual_machine" "k3s_vm" {
   }
 }
 
-# Create a virtual machine for observability
+# Create Virtual Machine for Observability
 resource "azurerm_linux_virtual_machine" "observability_vm" {
   name                  = "observabilityvm"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
+  location              = azurerm_resource_group.weather_app_rg.location
+  resource_group_name   = azurerm_resource_group.weather_app_rg.name
   network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
   size                  = "Standard_DS1_v2"
 
