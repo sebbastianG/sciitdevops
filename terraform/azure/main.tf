@@ -24,6 +24,19 @@ resource "azurerm_public_ip" "my_terraform_public_ip" {
   allocation_method   = "Dynamic"
 }
 
+resource "azurerm_network_interface" "my_terraform_nic" {
+  name                = "weather-app-nic"
+  location            = azurerm_resource_group.weather_app_rg.location
+  resource_group_name = azurerm_resource_group.weather_app_rg.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.my_terraform_subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip.id
+  }
+}
+
 resource "azurerm_linux_virtual_machine" "k3s_vm" {
   name                  = "k3svm"
   location              = azurerm_resource_group.weather_app_rg.location
