@@ -4,6 +4,30 @@ resource "azurerm_resource_group" "weather_app_rg" {
   location = var.weather_app_resource_group_location
 }
 
+# Create Virtual Network
+resource "azurerm_virtual_network" "my_vnet" {
+  name                = "weather-app-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.weather_app_rg.location
+  resource_group_name = azurerm_resource_group.weather_app_rg.name
+}
+
+# Create Subnet
+resource "azurerm_subnet" "my_terraform_subnet" {
+  name                 = "weather-app-subnet"
+  resource_group_name  = azurerm_resource_group.weather_app_rg.name
+  virtual_network_name = azurerm_virtual_network.my_vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Create Public IP
+resource "azurerm_public_ip" "my_terraform_public_ip" {
+  name                = "weather-app-public-ip"
+  resource_group_name = azurerm_resource_group.weather_app_rg.name
+  location            = azurerm_resource_group.weather_app_rg.location
+  allocation_method   = "Dynamic"
+}
+
 # Create Virtual Machine for K3s
 resource "azurerm_linux_virtual_machine" "k3s_vm" {
   name                  = "k3svm"
