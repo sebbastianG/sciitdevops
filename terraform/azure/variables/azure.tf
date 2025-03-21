@@ -21,16 +21,19 @@ variable "azure_tenant_id" {
 variable "resource_group_location" {
   type        = string
   description = "Azure region where the resource group is created"
+  default     = "Central India"  # Set default to avoid errors
 }
 
 variable "resource_group_name" {
   type        = string
   description = "Resource group name"
+  default     = "terraform-rg"  # Set default to avoid errors
 }
 
 variable "vm_admin_username" {
   type        = string
   description = "Admin username for the VM"
+  default     = "sebastian"  # Set default username
 }
 
 variable "ssh_public_key" {
