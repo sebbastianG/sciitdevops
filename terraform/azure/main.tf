@@ -1,39 +1,39 @@
-resource "azurerm_resource_group" "weather_app_rg" {
+resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.resource_group_location
 }
 
-resource "azurerm_virtual_network" "weather_app_vnet" {
+resource "azurerm_virtual_network" "main" {
   name                = "weather-app-vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.weather_app_rg.location
-  resource_group_name = azurerm_resource_group.weather_app_rg.name
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
 }
 
-resource "azurerm_subnet" "weather_app_subnet" {
+resource "azurerm_subnet" "main" {
   name                 = "weather-app-subnet"
-  resource_group_name  = azurerm_resource_group.weather_app_rg.name
-  virtual_network_name = azurerm_virtual_network.weather_app_vnet.name
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-resource "azurerm_public_ip" "weather_app_public_ip" {
+resource "azurerm_public_ip" "main" {
   name                = "weather-app-public-ip"
-  location            = azurerm_resource_group.weather_app_rg.location
-  resource_group_name = azurerm_resource_group.weather_app_rg.name
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
   allocation_method   = "Dynamic"
   sku                 = "Standard"
 }
 
-resource "azurerm_network_interface" "weather_app_nic" {
+resource "azurerm_network_interface" "main" {
   name                = "weather-app-nic"
-  location            = azurerm_resource_group.weather_app_rg.location
-  resource_group_name = azurerm_resource_group.weather_app_rg.name
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.weather_app_subnet.id
+    subnet_id                     = azurerm_subnet.main.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.weather_app_public_ip.id
+    public_ip_address_id          = azurerm_public_ip.main.id
   }
 }
