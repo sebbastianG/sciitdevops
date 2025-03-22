@@ -1,3 +1,6 @@
+# -------------------------
+# variables.tf
+# -------------------------
 variable "azure_subscription_id" {
   description = "Azure Subscription ID"
   type        = string
@@ -36,4 +39,19 @@ variable "vm_admin_username" {
 variable "ssh_public_key" {
   description = "SSH Public Key for VM login"
   type        = string
+}
+
+# -------------------------
+# outputs.tf
+# -------------------------
+output "ssh_public_key" {
+  value = tls_private_key.ssh.public_key_openssh
+}
+
+# -------------------------
+# ssh.tf
+# -------------------------
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
