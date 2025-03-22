@@ -1,3 +1,11 @@
+###########################
+# main.tf
+###########################
+
+provider "azurerm" {
+  features {}
+}
+
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.resource_group_location
@@ -20,26 +28,6 @@ resource "azurerm_subnet" "main" {
   default_outbound_access_enabled               = true
 }
 
-resource "azurerm_network_security_group" "weather_app_nsg" {
-  name                = "${var.resource_group_name}-nsg"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
-
-  security_rule {
-    name                       = "Allow-SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-}
-
-# ---------- PUBLIC IPs ----------
-
 resource "azurerm_public_ip" "k3s" {
   name                    = "${var.resource_group_name}-k3s-public-ip"
   location                = azurerm_resource_group.main.location
@@ -61,8 +49,6 @@ resource "azurerm_public_ip" "observability" {
   ip_version              = "IPv4"
   idle_timeout_in_minutes = 4
 }
-
-# ---------- NETWORK INTERFACES ----------
 
 resource "azurerm_network_interface" "k3s" {
   name                = "${var.resource_group_name}-k3s-nic"
@@ -89,20 +75,6 @@ resource "azurerm_network_interface" "observability" {
     public_ip_address_id          = azurerm_public_ip.observability.id
   }
 }
-
-# ---------- NSG Associations ----------
-
-resource "azurerm_network_interface_security_group_association" "k3s" {
-  network_interface_id      = azurerm_network_interface.k3s.id
-  network_security_group_id = azurerm_network_security_group.weather_app_nsg.id
-}
-
-resource "azurerm_network_interface_security_group_association" "observability" {
-  network_interface_id      = azurerm_network_interface.observability.id
-  network_security_group_id = azurerm_network_security_group.weather_app_nsg.id
-}
-
-# ---------- VIRTUAL MACHINES ----------
 
 resource "azurerm_linux_virtual_machine" "k3s" {
   name                = "${var.resource_group_name}-k3s-vm"
