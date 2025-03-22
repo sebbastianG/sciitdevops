@@ -1,4 +1,3 @@
-# FILE: terraform/azure/security.tf
 resource "azurerm_network_security_group" "weather_app_nsg" {
   name                = "weather-app-nsg"
   location            = azurerm_resource_group.weather_app_rg.location
