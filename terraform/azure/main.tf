@@ -21,8 +21,8 @@ resource "azurerm_public_ip" "main" {
   name                = "weather-app-public-ip"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
-  allocation_method   = "Basic"
-  sku                 = "Dynamic"
+  allocation_method   = "Dynamic"   
+  sku                 = "Basic"     
 }
 
 resource "azurerm_network_interface" "main" {
