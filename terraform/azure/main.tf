@@ -1,14 +1,8 @@
-provider "azurerm" {
-  features {}
-}
-
-# Resource Group
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.resource_group_location
 }
 
-# Virtual Network
 resource "azurerm_virtual_network" "main" {
   name                = "${var.resource_group_name}-vnet"
   address_space       = ["10.0.0.0/16"]
@@ -16,7 +10,6 @@ resource "azurerm_virtual_network" "main" {
   resource_group_name = azurerm_resource_group.main.name
 }
 
-# Subnet
 resource "azurerm_subnet" "main" {
   name                                          = "${var.resource_group_name}-subnet"
   resource_group_name                           = azurerm_resource_group.main.name
@@ -27,7 +20,26 @@ resource "azurerm_subnet" "main" {
   default_outbound_access_enabled               = true
 }
 
-# Public IP for k3s VM
+resource "azurerm_network_security_group" "weather_app_nsg" {
+  name                = "${var.resource_group_name}-nsg"
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
+
+  security_rule {
+    name                       = "Allow-SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+# ---------- PUBLIC IPs ----------
+
 resource "azurerm_public_ip" "k3s" {
   name                    = "${var.resource_group_name}-k3s-public-ip"
   location                = azurerm_resource_group.main.location
@@ -35,12 +47,10 @@ resource "azurerm_public_ip" "k3s" {
   allocation_method       = "Dynamic"
   sku                     = "Basic"
   sku_tier                = "Regional"
-  ddos_protection_mode    = "VirtualNetworkInherited"
-  idle_timeout_in_minutes = 4
   ip_version              = "IPv4"
+  idle_timeout_in_minutes = 4
 }
 
-# Public IP for Observability VM
 resource "azurerm_public_ip" "observability" {
   name                    = "${var.resource_group_name}-observability-public-ip"
   location                = azurerm_resource_group.main.location
@@ -48,12 +58,12 @@ resource "azurerm_public_ip" "observability" {
   allocation_method       = "Dynamic"
   sku                     = "Basic"
   sku_tier                = "Regional"
-  ddos_protection_mode    = "VirtualNetworkInherited"
-  idle_timeout_in_minutes = 4
   ip_version              = "IPv4"
+  idle_timeout_in_minutes = 4
 }
 
-# NIC for k3s VM
+# ---------- NETWORK INTERFACES ----------
+
 resource "azurerm_network_interface" "k3s" {
   name                = "${var.resource_group_name}-k3s-nic"
   location            = azurerm_resource_group.main.location
@@ -67,7 +77,6 @@ resource "azurerm_network_interface" "k3s" {
   }
 }
 
-# NIC for Observability VM
 resource "azurerm_network_interface" "observability" {
   name                = "${var.resource_group_name}-observability-nic"
   location            = azurerm_resource_group.main.location
@@ -81,38 +90,20 @@ resource "azurerm_network_interface" "observability" {
   }
 }
 
-# NSG to allow SSH
-resource "azurerm_network_security_group" "weather_app_nsg" {
-  name                = "${var.resource_group_name}-nsg"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
+# ---------- NSG Associations ----------
 
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-}
-
-# NSG Association for k3s NIC
 resource "azurerm_network_interface_security_group_association" "k3s" {
   network_interface_id      = azurerm_network_interface.k3s.id
   network_security_group_id = azurerm_network_security_group.weather_app_nsg.id
 }
 
-# NSG Association for observability NIC
 resource "azurerm_network_interface_security_group_association" "observability" {
   network_interface_id      = azurerm_network_interface.observability.id
   network_security_group_id = azurerm_network_security_group.weather_app_nsg.id
 }
 
-# k3s VM
+# ---------- VIRTUAL MACHINES ----------
+
 resource "azurerm_linux_virtual_machine" "k3s" {
   name                = "${var.resource_group_name}-k3s-vm"
   resource_group_name = azurerm_resource_group.main.name
@@ -120,9 +111,7 @@ resource "azurerm_linux_virtual_machine" "k3s" {
   size                = "Standard_B2s"
   admin_username      = var.vm_admin_username
 
-  network_interface_ids = [
-    azurerm_network_interface.k3s.id
-  ]
+  network_interface_ids = [azurerm_network_interface.k3s.id]
 
   admin_ssh_key {
     username   = var.vm_admin_username
@@ -147,7 +136,6 @@ resource "azurerm_linux_virtual_machine" "k3s" {
   }
 }
 
-# Observability VM
 resource "azurerm_linux_virtual_machine" "observability" {
   name                = "${var.resource_group_name}-observability-vm"
   resource_group_name = azurerm_resource_group.main.name
@@ -155,9 +143,7 @@ resource "azurerm_linux_virtual_machine" "observability" {
   size                = "Standard_B2s"
   admin_username      = var.vm_admin_username
 
-  network_interface_ids = [
-    azurerm_network_interface.observability.id
-  ]
+  network_interface_ids = [azurerm_network_interface.observability.id]
 
   admin_ssh_key {
     username   = var.vm_admin_username
