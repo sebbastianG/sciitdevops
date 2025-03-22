@@ -21,7 +21,8 @@ resource "azurerm_public_ip" "weather_app_public_ip" {
   name                = "weather-app-public-ip"
   location            = azurerm_resource_group.weather_app_rg.location
   resource_group_name = azurerm_resource_group.weather_app_rg.name
-  allocation_method   = "Dynamic"
+
+  allocation_method   = "Static"   # ✅ Fixed
   sku                 = "Standard"
 }
 
