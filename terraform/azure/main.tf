@@ -1,14 +1,18 @@
-# main.tf
+resource "azurerm_resource_group" "main" {
+  name     = var.resource_group_name
+  location = var.resource_group_location
+}
+
 resource "azurerm_virtual_network" "main" {
-  name                = "${var.resource_group_name}-vnet"
+  name                = "${azurerm_resource_group.main.name}-vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 }
 
 resource "azurerm_subnet" "main" {
-  name                                          = "${var.resource_group_name}-subnet"
-  resource_group_name                           = var.resource_group_name
+  name                                          = "${azurerm_resource_group.main.name}-subnet"
+  resource_group_name                           = azurerm_resource_group.main.name
   virtual_network_name                          = azurerm_virtual_network.main.name
   address_prefixes                              = ["10.0.1.0/24"]
   private_endpoint_network_policies             = "Disabled"
@@ -17,9 +21,9 @@ resource "azurerm_subnet" "main" {
 }
 
 resource "azurerm_public_ip" "main" {
-  name                    = "${var.resource_group_name}-public-ip"
-  location                = var.resource_group_location
-  resource_group_name     = var.resource_group_name
+  name                    = "${azurerm_resource_group.main.name}-public-ip"
+  location                = azurerm_resource_group.main.location
+  resource_group_name     = azurerm_resource_group.main.name
   allocation_method       = "Dynamic"
   sku                     = "Basic"
   sku_tier                = "Regional"
@@ -29,9 +33,9 @@ resource "azurerm_public_ip" "main" {
 }
 
 resource "azurerm_network_interface" "main" {
-  name                = "${var.resource_group_name}-nic"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
+  name                = "${azurerm_resource_group.main.name}-nic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   ip_configuration {
     name                          = "internal"
