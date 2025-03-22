@@ -18,13 +18,13 @@ variable "azure_tenant_id" {
   type        = string
 }
 
-variable "weather_app_resource_group_name" {
-  description = "Name of the resource group for the Weather App"
+variable "resource_group_name" {
+  description = "Name of the Azure resource group"
   type        = string
 }
 
-variable "weather_app_resource_group_location" {
-  description = "Azure region for the Weather App resource group"
+variable "resource_group_location" {
+  description = "Location of the Azure resource group"
   type        = string
 }
 
