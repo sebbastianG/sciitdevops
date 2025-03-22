@@ -45,7 +45,7 @@ resource "azurerm_linux_virtual_machine" "k3s_vm" {
   size                  = "Standard_DS1_v2"
 
   os_disk {
-    name                 = "myOsDisk"
+    name                 = "k3sOsDisk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -74,7 +74,7 @@ resource "azurerm_linux_virtual_machine" "observability_vm" {
   size                  = "Standard_DS1_v2"
 
   os_disk {
-    name                 = "myOsDisk"
+    name                 = "observabilityOsDisk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
