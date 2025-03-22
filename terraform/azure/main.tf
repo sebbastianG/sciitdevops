@@ -19,8 +19,8 @@ resource "azurerm_subnet" "weather_app_subnet" {
 
 resource "azurerm_public_ip" "weather_app_public_ip" {
   name                = "weather-app-public-ip"
-  resource_group_name = azurerm_resource_group.weather_app_rg.name
   location            = azurerm_resource_group.weather_app_rg.location
+  resource_group_name = azurerm_resource_group.weather_app_rg.name
   allocation_method   = "Dynamic"
   sku                 = "Standard"
 }
