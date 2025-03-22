@@ -1,5 +1,3 @@
-# File: terraform/azure/variables/azure.tf
-
 variable "azure_subscription_id" {
   type        = string
   description = "Azure Subscription ID"
