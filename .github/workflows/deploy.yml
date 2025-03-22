@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/azure
 
     steps:
       - name: Checkout repository
@@ -18,30 +21,23 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform/azure
 
       - name: Terraform Plan
-        run: |
-          terraform plan \
-            -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-            -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
-            -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
-            -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-            -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
-            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
-        working-directory: terraform/azure
+        run: terraform plan -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+                            -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+                            -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+                            -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+                            -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+                            -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
+                            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
+                            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
       - name: Terraform Apply
-        run: |
-          terraform apply -auto-approve \
-            -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-            -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
-            -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
-            -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-            -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
-            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
-        working-directory: terraform/azure
+        run: terraform apply -auto-approve -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+                                             -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+                                             -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+                                             -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+                                             -var="weather_app_resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+                                             -var="weather_app_resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
+                                             -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
+                                             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
