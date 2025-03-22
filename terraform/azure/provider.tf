@@ -4,7 +4,13 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.24.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
   }
+
+  required_version = ">= 1.3.0"
 }
 
 provider "azurerm" {
