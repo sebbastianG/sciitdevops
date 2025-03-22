@@ -1,6 +1,5 @@
-resource "azurerm_resource_group" "weather_app_rg" {
-  name     = var.weather_app_resource_group_name
-  location = var.weather_app_resource_group_location
+data "azurerm_resource_group" "weather_app_rg" {
+  name = var.weather_app_resource_group_name
 }
 
 resource "azurerm_virtual_network" "weather_app_vnet" {
