@@ -21,8 +21,8 @@ resource "azurerm_public_ip" "main" {
   name                = "weather-app-public-ip"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-  sku                 = "Standard"
+  allocation_method   = "Basic"
+  sku                 = "Dynamic"
 }
 
 resource "azurerm_network_interface" "main" {
@@ -33,7 +33,7 @@ resource "azurerm_network_interface" "main" {
   ip_configuration {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.main.id
-    private_ip_address_allocation = "Static"
+    private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.main.id
   }
 }
