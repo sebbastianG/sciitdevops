@@ -1,17 +1,24 @@
+provider "azurerm" {
+  features {}
+}
+
+# Resource Group
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.resource_group_location
 }
 
+# Virtual Network
 resource "azurerm_virtual_network" "main" {
-  name                = "${azurerm_resource_group.main.name}-vnet"
+  name                = "${var.resource_group_name}-vnet"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 }
 
+# Subnet
 resource "azurerm_subnet" "main" {
-  name                                          = "${azurerm_resource_group.main.name}-subnet"
+  name                                          = "${var.resource_group_name}-subnet"
   resource_group_name                           = azurerm_resource_group.main.name
   virtual_network_name                          = azurerm_virtual_network.main.name
   address_prefixes                              = ["10.0.1.0/24"]
@@ -20,8 +27,9 @@ resource "azurerm_subnet" "main" {
   default_outbound_access_enabled               = true
 }
 
-resource "azurerm_public_ip" "main" {
-  name                    = "${azurerm_resource_group.main.name}-public-ip"
+# Public IP for k3s VM
+resource "azurerm_public_ip" "k3s" {
+  name                    = "${var.resource_group_name}-k3s-public-ip"
   location                = azurerm_resource_group.main.location
   resource_group_name     = azurerm_resource_group.main.name
   allocation_method       = "Dynamic"
@@ -32,8 +40,22 @@ resource "azurerm_public_ip" "main" {
   ip_version              = "IPv4"
 }
 
-resource "azurerm_network_interface" "main" {
-  name                = "${azurerm_resource_group.main.name}-nic"
+# Public IP for Observability VM
+resource "azurerm_public_ip" "observability" {
+  name                    = "${var.resource_group_name}-observability-public-ip"
+  location                = azurerm_resource_group.main.location
+  resource_group_name     = azurerm_resource_group.main.name
+  allocation_method       = "Dynamic"
+  sku                     = "Basic"
+  sku_tier                = "Regional"
+  ddos_protection_mode    = "VirtualNetworkInherited"
+  idle_timeout_in_minutes = 4
+  ip_version              = "IPv4"
+}
+
+# NIC for k3s VM
+resource "azurerm_network_interface" "k3s" {
+  name                = "${var.resource_group_name}-k3s-nic"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -41,7 +63,121 @@ resource "azurerm_network_interface" "main" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.main.id
     private_ip_address_allocation = "Dynamic"
-    private_ip_address_version    = "IPv4"
-    public_ip_address_id          = azurerm_public_ip.main.id
+    public_ip_address_id          = azurerm_public_ip.k3s.id
+  }
+}
+
+# NIC for Observability VM
+resource "azurerm_network_interface" "observability" {
+  name                = "${var.resource_group_name}-observability-nic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.main.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.observability.id
+  }
+}
+
+# NSG to allow SSH
+resource "azurerm_network_security_group" "weather_app_nsg" {
+  name                = "${var.resource_group_name}-nsg"
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+# NSG Association for k3s NIC
+resource "azurerm_network_interface_security_group_association" "k3s" {
+  network_interface_id      = azurerm_network_interface.k3s.id
+  network_security_group_id = azurerm_network_security_group.weather_app_nsg.id
+}
+
+# NSG Association for observability NIC
+resource "azurerm_network_interface_security_group_association" "observability" {
+  network_interface_id      = azurerm_network_interface.observability.id
+  network_security_group_id = azurerm_network_security_group.weather_app_nsg.id
+}
+
+# k3s VM
+resource "azurerm_linux_virtual_machine" "k3s" {
+  name                = "${var.resource_group_name}-k3s-vm"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = "Standard_B2s"
+  admin_username      = var.vm_admin_username
+
+  network_interface_ids = [
+    azurerm_network_interface.k3s.id
+  ]
+
+  admin_ssh_key {
+    username   = var.vm_admin_username
+    public_key = var.ssh_public_key
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+    name                 = "${var.resource_group_name}-k3s-osdisk"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+
+  tags = {
+    role = "k3s"
+  }
+}
+
+# Observability VM
+resource "azurerm_linux_virtual_machine" "observability" {
+  name                = "${var.resource_group_name}-observability-vm"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = "Standard_B2s"
+  admin_username      = var.vm_admin_username
+
+  network_interface_ids = [
+    azurerm_network_interface.observability.id
+  ]
+
+  admin_ssh_key {
+    username   = var.vm_admin_username
+    public_key = var.ssh_public_key
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+    name                 = "${var.resource_group_name}-observability-osdisk"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+
+  tags = {
+    role = "observability"
   }
 }
