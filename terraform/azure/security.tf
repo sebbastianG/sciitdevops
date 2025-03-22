@@ -1,6 +1,4 @@
-###########################
 # security.tf
-###########################
 
 resource "azurerm_network_security_group" "weather_app_nsg" {
   name                = "${var.resource_group_name}-nsg"
@@ -8,7 +6,7 @@ resource "azurerm_network_security_group" "weather_app_nsg" {
   resource_group_name = var.resource_group_name
 
   security_rule {
-    name                       = "SSH"
+    name                       = "Allow-SSH"
     priority                   = 1001
     direction                  = "Inbound"
     access                     = "Allow"
