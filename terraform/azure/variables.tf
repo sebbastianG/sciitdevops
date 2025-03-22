@@ -1,39 +1,39 @@
 variable "azure_subscription_id" {
-  type        = string
   description = "Azure Subscription ID"
+  type        = string
 }
 
 variable "azure_client_id" {
-  type        = string
   description = "Azure Client ID"
+  type        = string
 }
 
 variable "azure_client_secret" {
-  type        = string
   description = "Azure Client Secret"
+  type        = string
 }
 
 variable "azure_tenant_id" {
-  type        = string
   description = "Azure Tenant ID"
+  type        = string
 }
 
 variable "weather_app_resource_group_name" {
+  description = "Name of the resource group for the Weather App"
   type        = string
-  description = "Resource group name for Weather App"
 }
 
 variable "weather_app_resource_group_location" {
+  description = "Azure region for the Weather App resource group"
   type        = string
-  description = "Azure region where the Weather App resource group is created"
 }
 
 variable "vm_admin_username" {
+  description = "VM administrator username"
   type        = string
-  description = "Admin username for the VM"
 }
 
 variable "ssh_public_key" {
-  type        = string
   description = "SSH Public Key for VM login"
+  type        = string
 }
