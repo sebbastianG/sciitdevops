@@ -6,29 +6,82 @@ on:
       - main
 
 env:
+  # Azure secrets
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+  # AWS secrets
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}  # E.g., eu-central-1 for Frankfurt
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Terraform Init
+      # Azure Terraform Init
+      - name: Terraform Init for Azure
         run: terraform -chdir=terraform/azure init
 
-      - name: Terraform Plan
+      # Azure Terraform Plan
+      - name: Terraform Plan for Azure
         run: |
-          terraform -chdir=terraform/azure plan             -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"             -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}"             -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}"             -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}"             -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}"             -var="resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}"             -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}"             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+          terraform -chdir=terraform/azure plan \
+            -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+            -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+            -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+            -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+            -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var="resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
+            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
+            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
-      - name: Terraform Apply
+      # Apply Terraform for Azure
+      - name: Terraform Apply for Azure
         run: |
-          terraform -chdir=terraform/azure apply -auto-approve             -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"             -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}"             -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}"             -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}"             -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}"             -var="resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}"             -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}"             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+          terraform -chdir=terraform/azure apply -auto-approve \
+            -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+            -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+            -var="azure_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+            -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+            -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var="resource_group_location=${{ secrets.RESOURCE_GROUP_LOCATION }}" \
+            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
+            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+
+      # AWS Terraform Init (For AWS)
+      - name: Terraform Init for AWS
+        run: terraform -chdir=terraform/aws init
+
+      # AWS Terraform Plan (For AWS)
+      - name: Terraform Plan for AWS
+        run: |
+          terraform -chdir=terraform/aws plan \
+            -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -var="aws_default_region=${{ secrets.AWS_DEFAULT_REGION }}" \
+            -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
+            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+
+      # Apply Terraform for AWS
+      - name: Terraform Apply for AWS
+        run: |
+          terraform -chdir=terraform/aws apply -auto-approve \
+            -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -var="aws_default_region=${{ secrets.AWS_DEFAULT_REGION }}" \
+            -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
+            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
