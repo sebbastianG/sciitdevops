@@ -1,8 +1,8 @@
 resource "aws_instance" "vm" {
-  ami                         = "ami-0c55b159cbfafe1f0" # Update based on region
+  ami                         = "ami-0c55b159cbfafe1f0"
   instance_type               = "t2.micro"
+  key_name                    = "your-key-name" # optional
   associate_public_ip_address = true
-  key_name                    = null # Or provide your key name
 
   tags = {
     Name = "${var.resource_group_name}-vm"
@@ -12,12 +12,12 @@ resource "aws_instance" "vm" {
     inline = [
       "echo Hello from Terraform"
     ]
+  }
 
-    connection {
-      type        = "ssh"
-      user        = var.vm_admin_username
-      private_key = file("~/.ssh/id_rsa")
-      host        = self.public_ip
-    }
+  connection {
+    type        = "ssh"
+    user        = var.vm_admin_username
+    private_key = file(var.ssh_private_key_path)
+    host        = self.public_ip
   }
 }
