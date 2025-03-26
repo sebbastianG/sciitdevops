@@ -33,3 +33,8 @@ variable "ssh_public_key" {
   description = "Public key for EC2 instance access"
   type        = string
 }
+
+variable "ssh_private_key_path" {
+  description = "Path to private SSH key for EC2 connection"
+  type        = string
+}
