@@ -1,9 +1,4 @@
-output "instance_id" {
-  description = "The ID of the EC2 instance"
-  value       = aws_instance.vm.id
-}
-
-output "public_ip" {
-  description = "The public IP of the EC2 instance"
-  value       = aws_instance.vm.public_ip
+output "s3_bucket_arn" {
+  value       = aws_s3_bucket.example.arn
+  description = "ARN of the S3 bucket"
 }
