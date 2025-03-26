@@ -1,27 +1,29 @@
-# terraform/aws/variables.tf
-
-variable "aws_region" {
-  description = "The AWS region to deploy resources"
+variable "aws_access_key_id" {
+  description = "AWS access key ID"
   type        = string
 }
 
-variable "aws_access_key" {
-  description = "AWS access key"
+variable "aws_secret_access_key" {
+  description = "AWS secret access key"
   type        = string
 }
 
-variable "aws_secret_key" {
-  description = "AWS secret key"
+variable "aws_default_region" {
+  description = "AWS default region"
   type        = string
 }
 
-variable "instance_type" {
-  description = "EC2 instance type"
+variable "resource_group_name" {
+  description = "Name of the resource group"
   type        = string
-  default     = "t2.micro"
 }
 
-variable "bucket_name" {
-  description = "Name of the S3 bucket"
+variable "vm_admin_username" {
+  description = "Admin username for the virtual machine"
+  type        = string
+}
+
+variable "ssh_public_key" {
+  description = "SSH public key for accessing the virtual machine"
   type        = string
 }
