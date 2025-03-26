@@ -1,7 +1,7 @@
 aws_access_key_id     = "YOUR_ACCESS_KEY"
 aws_secret_access_key = "YOUR_SECRET_KEY"
 aws_default_region    = "eu-central-1"
-bucket_name           = "my-terraform-s3-bucket"
+bucket_name           = "my-unique-bucket-name-2025"
 
 resource_group_name   = "weather-app"
 vm_admin_username     = "ubuntu"
