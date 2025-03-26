@@ -10,31 +10,26 @@ variable "aws_secret_access_key" {
 }
 
 variable "aws_default_region" {
-  description = "AWS region to deploy resources in"
+  description = "AWS region"
   type        = string
 }
 
 variable "bucket_name" {
-  description = "Unique name for the S3 bucket"
+  description = "S3 bucket name"
   type        = string
 }
 
 variable "resource_group_name" {
-  description = "Name prefix for tagging AWS resources"
+  description = "Name used for prefixing AWS resources (e.g. tag)"
   type        = string
 }
 
 variable "vm_admin_username" {
-  description = "Username for SSH access to the EC2 instance"
+  description = "EC2 instance SSH username"
   type        = string
 }
 
 variable "ssh_public_key" {
-  description = "SSH public key for EC2 access"
-  type        = string
-}
-
-variable "key_name" {
-  description = "Name of the existing AWS key pair to use for EC2"
+  description = "Public key for EC2 instance access"
   type        = string
 }
