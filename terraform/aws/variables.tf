@@ -34,7 +34,7 @@ variable "ssh_public_key" {
   type        = string
 }
 
-variable "ssh_private_key_path" {
-  description = "Path to private SSH key for EC2 connection"
+variable "key_name" {
+  description = "EC2 key pair name"
   type        = string
 }
