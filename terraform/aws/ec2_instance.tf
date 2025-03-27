@@ -1,3 +1,5 @@
+# terraform/aws/ec2_instance.tf
+
 resource "aws_instance" "vm" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
@@ -18,6 +20,7 @@ resource "aws_instance" "vm" {
       type        = "ssh"
       user        = var.vm_admin_username
       host        = self.public_ip
+      private_key = file("~/.ssh/sebastian.pem")
       timeout     = "2m"
     }
   }
