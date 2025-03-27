@@ -10,36 +10,36 @@ variable "aws_secret_access_key" {
 }
 
 variable "aws_default_region" {
-  description = "AWS region (e.g., eu-central-1)"
+  description = "AWS region"
   type        = string
 }
 
 variable "bucket_name" {
-  description = "Name of the S3 bucket"
+  description = "S3 bucket name"
   type        = string
 }
 
 variable "resource_group_name" {
-  description = "Prefix for naming AWS resources"
+  description = "Name used for prefixing AWS resources"
   type        = string
 }
 
 variable "vm_admin_username" {
-  description = "Username for EC2 SSH access"
+  description = "EC2 instance SSH username"
   type        = string
 }
 
 variable "ssh_public_key" {
-  description = "SSH public key content"
-  type        = string
-}
-
-variable "ssh_private_key_path" {
-  description = "Path to SSH private key for remote-exec connection"
+  description = "Public key for EC2 instance access"
   type        = string
 }
 
 variable "key_name" {
-  description = "Name of the EC2 Key Pair created in AWS"
+  description = "EC2 key pair name"
+  type        = string
+}
+
+variable "ssh_private_key_path" {
+  description = "Path to the private SSH key for EC2 connection"
   type        = string
 }
