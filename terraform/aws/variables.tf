@@ -34,3 +34,8 @@ variable "vm_admin_password" {
   type        = string
   sensitive   = true
 }
+
+variable "ssh_public_key" {
+  description = "Public key used for EC2 key pair"
+  type        = string
+}
