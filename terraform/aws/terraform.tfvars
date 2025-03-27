@@ -4,7 +4,7 @@ aws_secret_access_key = "your-secret-access-key"
 aws_default_region    = "eu-central-1"
 
 # S3 Bucket Configuration
-bucket_name           = "my-terraform-bucket-victor123"
+bucket_name           = "my-terraform-bucket-sebba123"
 
 # General Settings
 resource_group_name   = "weather-app"
