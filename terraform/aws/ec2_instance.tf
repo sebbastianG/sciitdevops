@@ -32,12 +32,12 @@ resource "aws_instance" "vm" {
     inline = [
       "echo Hello from Terraform"
     ]
-  }
 
-  connection {
-    type        = "ssh"
-    user        = var.vm_admin_username
-    private_key = file(var.ssh_private_key_path)
-    host        = self.public_ip
+    connection {
+      type        = "ssh"
+      user        = var.vm_admin_username           # This will be set to "sebastian"
+      private_key = file(var.ssh_private_key_path)  # Path passed via tfvars or GitHub secret
+      host        = self.public_ip
+    }
   }
 }
