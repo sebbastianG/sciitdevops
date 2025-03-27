@@ -1,4 +1,3 @@
-# AWS Credentials
 variable "aws_access_key_id" {
   description = "AWS access key ID"
   type        = string
@@ -15,19 +14,16 @@ variable "aws_default_region" {
   type        = string
 }
 
-# S3 Bucket Configuration
 variable "bucket_name" {
   description = "S3 bucket name"
   type        = string
 }
 
-# General Settings
 variable "resource_group_name" {
   description = "Name used for prefixing AWS resources"
   type        = string
 }
 
-# EC2 Instance Configuration
 variable "vm_admin_username" {
   description = "EC2 instance SSH username"
   type        = string
