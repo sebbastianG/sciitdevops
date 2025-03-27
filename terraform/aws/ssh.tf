@@ -1,11 +1,13 @@
-# Generate a new SSH key pair
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-# Create AWS key pair using the generated public key
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
 resource "aws_key_pair" "generated" {
-  key_name   = "sebastian"  # This will be your key_name used in EC2
+  key_name   = "generated-${random_id.suffix.hex}"
   public_key = tls_private_key.ssh.public_key_openssh
 }
