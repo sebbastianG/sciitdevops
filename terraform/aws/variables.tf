@@ -29,16 +29,6 @@ variable "vm_admin_username" {
   type        = string
 }
 
-variable "ssh_public_key" {
-  description = "Public key for EC2 instance access"
-  type        = string
-}
-
-variable "key_name" {
-  description = "EC2 key pair name"
-  type        = string
-}
-
 variable "vm_admin_password" {
   description = "Password for EC2 user"
   type        = string
