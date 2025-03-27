@@ -4,30 +4,31 @@ resource "aws_instance" "vm" {
   key_name                    = var.key_name
   associate_public_ip_address = true
 
+  user_data = <<-EOF
+              #!/bin/bash
+              echo 'sebastian:Seb123!@#' | chpasswd
+              sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+              systemctl restart sshd
+              EOF
+
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+
   tags = {
     Name = "${var.resource_group_name}-vm"
   }
 
-  user_data = <<EOF
-#!/bin/bash
-sudo useradd -m -s /bin/bash sebastian
-echo "sebastian:Seb123!@#" | sudo chpasswd
-sudo usermod -aG sudo sebastian
-EOF
-
   provisioner "remote-exec" {
     inline = [
-      "echo VM ready",
       "sudo apt-get update -y",
       "sudo apt-get install -y nginx"
     ]
 
     connection {
       type     = "ssh"
-      user     = "sebastian"
-      host     = self.public_ip
+      user     = var.vm_admin_username
       password = "Seb123!@#"
-      timeout  = "2m"
+      host     = self.public_ip
+      timeout  = "3m"
     }
   }
 }
