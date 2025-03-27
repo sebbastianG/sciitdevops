@@ -1,16 +1,8 @@
-# terraform/aws/s3_instance.tf
-
-resource "random_string" "rand" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 resource "aws_s3_bucket" "example" {
-  bucket = "${var.bucket_name}-${random_string.rand.result}"
+  bucket = var.bucket_name
 
   tags = {
-    Name        = "my-terraform-bucket-${random_string.rand.result}"
+    Name        = "my-terraform-bucket-sebi123-xyz"
     Environment = "Dev"
   }
 }
