@@ -17,7 +17,6 @@ resource "aws_instance" "vm" {
   connection {
     type        = "ssh"
     user        = var.vm_admin_username
-    private_key = file(var.ssh_private_key_path)
     host        = self.public_ip
   }
 }
