@@ -1,5 +1,3 @@
-# terraform/aws/variables.tf
-
 variable "aws_access_key_id" {
   description = "AWS access key ID"
   type        = string
