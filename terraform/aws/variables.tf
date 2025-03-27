@@ -38,3 +38,9 @@ variable "key_name" {
   description = "EC2 key pair name"
   type        = string
 }
+
+variable "vm_admin_password" {
+  description = "Password for EC2 user"
+  type        = string
+  sensitive   = true
+}
