@@ -1,5 +1,3 @@
-# terraform/aws/ec2_instance.tf
-
 resource "aws_instance" "vm" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
