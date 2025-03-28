@@ -3,6 +3,7 @@ resource "aws_instance" "vm" {
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.allow_ssh.id]
+  key_name                    = aws_key_pair.generated.key_name
 
   tags = {
     Name = "${var.resource_group_name}-vm"
@@ -13,12 +14,13 @@ resource "aws_instance" "vm" {
               useradd -m -s /bin/bash ${var.vm_admin_username}
               echo "${var.vm_admin_username}:${var.vm_admin_password}" | chpasswd
               echo "${var.vm_admin_username} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+              sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
               systemctl restart ssh
               EOF
 
   provisioner "remote-exec" {
     inline = [
+      "sleep 30",
       "echo 'Provisioned successfully!'"
     ]
 
@@ -29,5 +31,20 @@ resource "aws_instance" "vm" {
       host     = self.public_ip
       timeout  = "2m"
     }
+  }
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
