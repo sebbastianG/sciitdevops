@@ -14,7 +14,7 @@ resource "aws_instance" "vm" {
               useradd -m -s /bin/bash ${var.vm_admin_username}
               echo "${var.vm_admin_username}:${var.vm_admin_password}" | chpasswd
               echo "${var.vm_admin_username} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+              sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
               systemctl restart ssh
               EOF
 
@@ -31,20 +31,5 @@ resource "aws_instance" "vm" {
       host     = self.public_ip
       timeout  = "2m"
     }
-  }
-}
-
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"]
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
   }
 }
