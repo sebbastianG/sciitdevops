@@ -15,33 +15,22 @@ variable "aws_default_region" {
 }
 
 variable "bucket_name" {
-  description = "Name of the S3 bucket to create"
+  description = "S3 bucket name"
   type        = string
 }
 
 variable "resource_group_name" {
-  description = "Project or resource group name used in tags"
+  description = "Name used for prefixing AWS resources"
   type        = string
 }
 
 variable "vm_admin_username" {
-  description = "Username for the EC2 VM administrator"
+  description = "EC2 instance SSH username"
   type        = string
 }
 
 variable "vm_admin_password" {
-  description = "Password for the EC2 VM administrator"
+  description = "EC2 instance SSH password"
   type        = string
   sensitive   = true
-}
-
-variable "key_name" {
-  description = "Name of the SSH key pair to create in AWS"
-  type        = string
-}
-
-variable "ssh_public_key" {
-  description = "Optional: SSH public key to use. If empty, a key will be generated automatically."
-  type        = string
-  default     = ""
 }
