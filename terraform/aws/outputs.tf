@@ -1,9 +1,3 @@
-output "private_key_pem" {
-  description = "The private key in PEM format"
-  value       = tls_private_key.generated_key.private_key_pem
-  sensitive   = true
-}
-
 output "instance_id" {
   value = aws_instance.vm.id
 }
