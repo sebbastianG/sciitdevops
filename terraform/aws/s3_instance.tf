@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "sebica" {
+resource "aws_s3_bucket" "example" {
   bucket = var.bucket_name
   force_destroy = true
 
