@@ -1,41 +1,46 @@
 variable "aws_access_key_id" {
-  description = "AWS access key ID"
   type        = string
+  description = "AWS access key"
 }
 
 variable "aws_secret_access_key" {
-  description = "AWS secret access key"
   type        = string
+  description = "AWS secret key"
   sensitive   = true
 }
 
 variable "aws_default_region" {
-  description = "AWS region"
   type        = string
+  description = "AWS region"
 }
 
 variable "bucket_name" {
-  description = "S3 bucket name"
   type        = string
+  description = "Globally unique S3 bucket name"
 }
 
 variable "resource_group_name" {
-  description = "Name used for prefixing AWS resources"
   type        = string
+  description = "Prefix name for AWS resources"
 }
 
 variable "vm_admin_username" {
-  description = "EC2 instance SSH username"
   type        = string
+  description = "EC2 instance login username"
 }
 
 variable "vm_admin_password" {
-  description = "Password for EC2 user"
   type        = string
+  description = "Password for admin user"
   sensitive   = true
 }
 
-variable "ssh_public_key" {
-  description = "Public key used for EC2 key pair"
+variable "key_name" {
   type        = string
+  description = "Name of the EC2 key pair"
+}
+
+variable "ssh_public_key" {
+  type        = string
+  description = "SSH public key"
 }
