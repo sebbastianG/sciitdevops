@@ -1,9 +1,9 @@
 resource "aws_instance" "vm" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
-  key_name                    = aws_key_pair.generated.key_name
-  vpc_security_group_ids      = [aws_security_group.allow_ssh.id]
   associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.allow_ssh.id]
+  key_name                    = aws_key_pair.generated.key_name
 
   tags = {
     Name = "${var.resource_group_name}-vm"
@@ -15,7 +15,7 @@ resource "aws_instance" "vm" {
               echo "${var.vm_admin_username}:${var.vm_admin_password}" | chpasswd
               echo "${var.vm_admin_username} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
               sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-              systemctl restart sshd
+              systemctl restart ssh
               EOF
 
   provisioner "remote-exec" {
