@@ -1,5 +1,5 @@
-aws_access_key_id     = "YOUR_KEY_ID"
-aws_secret_access_key = "YOUR_SECRET_KEY"
+aws_access_key_id     = "your-access-key"
+aws_secret_access_key = "your-secret-key"
 aws_default_region    = "eu-central-1"
 
 bucket_name           = "your-unique-bucket-name-123456"
