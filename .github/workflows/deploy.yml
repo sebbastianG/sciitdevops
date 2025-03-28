@@ -15,7 +15,7 @@ env:
   # AWS secrets
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}  # E.g., eu-central-1 for Frankfurt
+  AWS_DEFAULT_REGION: eu-west-1  # Ireland (per your request)
 
 jobs:
   deploy:
@@ -30,11 +30,11 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # Azure Terraform Init
+      # 🔵 Azure: Terraform Init
       - name: Terraform Init for Azure
         run: terraform -chdir=terraform/azure init
 
-      # Azure Terraform Plan
+      # 🔵 Azure: Terraform Plan
       - name: Terraform Plan for Azure
         run: |
           terraform -chdir=terraform/azure plan \
@@ -47,7 +47,7 @@ jobs:
             -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
-      # Apply Terraform for Azure
+      # 🔵 Azure: Terraform Apply
       - name: Terraform Apply for Azure
         run: |
           terraform -chdir=terraform/azure apply -auto-approve \
@@ -60,28 +60,26 @@ jobs:
             -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
 
-      # AWS Terraform Init (For AWS)
+      # 🟢 AWS: Terraform Init
       - name: Terraform Init for AWS
         run: terraform -chdir=terraform/aws init
 
-      # AWS Terraform Plan (For AWS)
+      # 🟢 AWS: Terraform Plan (no SSH key passed — generated via Terraform code)
       - name: Terraform Plan for AWS
         run: |
           terraform -chdir=terraform/aws plan \
             -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -var="aws_default_region=${{ secrets.AWS_DEFAULT_REGION }}" \
+            -var="aws_default_region=${{ env.AWS_DEFAULT_REGION }}" \
             -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}"
 
-      # Apply Terraform for AWS
+      # 🟢 AWS: Terraform Apply
       - name: Terraform Apply for AWS
         run: |
           terraform -chdir=terraform/aws apply -auto-approve \
             -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -var="aws_default_region=${{ secrets.AWS_DEFAULT_REGION }}" \
+            -var="aws_default_region=${{ env.AWS_DEFAULT_REGION }}" \
             -var="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}" \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+            -var="vm_admin_username=${{ secrets.VM_ADMIN_USERNAME }}"
