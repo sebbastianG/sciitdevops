@@ -20,17 +20,17 @@ variable "bucket_name" {
 }
 
 variable "resource_group_name" {
-  description = "Name used for prefixing AWS resources"
+  description = "Prefix for resources"
   type        = string
 }
 
 variable "vm_admin_username" {
-  description = "EC2 instance SSH username"
+  description = "VM username"
   type        = string
 }
 
 variable "vm_admin_password" {
-  description = "EC2 instance SSH password"
+  description = "VM password"
   type        = string
   sensitive   = true
 }
