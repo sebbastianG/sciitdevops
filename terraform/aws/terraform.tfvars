@@ -8,6 +8,6 @@ resource_group_name   = "weather-app"
 vm_admin_username     = "sebastian"
 vm_admin_password     = "Seb123!@#"
 
-ami_id         = "ami-0c55b159cbfafe1f0"   # Amazon Linux 2 AMI (eu-west-1)
+ami_id         = "ami-0cac7f4178fe0be94"   # Amazon Linux 2 AMI (eu-west-1)
 instance_type  = "t2.micro"
 subnet_id      = "subnet-0123456789abcdef0"  # Replace with a valid subnet in your VPC
