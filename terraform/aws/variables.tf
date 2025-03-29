@@ -34,3 +34,18 @@ variable "vm_admin_password" {
   type        = string
   sensitive   = true
 }
+
+variable "ami_id" {
+  description = "The AMI ID to use for the instance"
+  type        = string
+}
+
+variable "instance_type" {
+  description = "The type of instance to start"
+  type        = string
+}
+
+variable "subnet_id" {
+  description = "The VPC Subnet ID to launch the instance in"
+  type        = string
+}
