@@ -4,7 +4,7 @@ resource "aws_instance" "vm" {
   instance_type          = var.instance_type
   key_name               = aws_key_pair.ec2_key.key_name
   subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.vm_sg.id]
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
 
   provisioner "remote-exec" {
     inline = [
