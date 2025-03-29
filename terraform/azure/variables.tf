@@ -44,3 +44,10 @@ variable "ssh_public_key" {
 
 
 
+
+
+variable "vm_admin_password" {
+  type        = string
+  description = "Admin password for the VM"
+  sensitive   = true
+}
