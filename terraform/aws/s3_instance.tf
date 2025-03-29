@@ -1,8 +1,12 @@
+
+resource "random_id" "bucket_id" {
+  byte_length = 4
+}
+
 resource "aws_s3_bucket" "jefrijeronimo" {
-  bucket = "${var.bucket_name}-${replace(timestamp(), ":", "-")}"
+  bucket = "your-unique-bucket-${random_id.bucket_id.hex}"
 
   tags = {
-    Name        = var.bucket_name
-    Environment = "Dev"
+    Name = "MyS3Bucket"
   }
 }
