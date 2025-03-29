@@ -2,9 +2,9 @@
 # security.tf
 # -------------------------
 resource "azurerm_network_security_group" "weather_app_nsg" {
-  name                = "${var.resource_group_name}-nsg"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
+  name                = "${azurerm_resource_group.main.name}-nsg"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
 
   security_rule {
     name                       = "Allow-SSH"
