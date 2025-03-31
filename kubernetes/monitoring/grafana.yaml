@@ -22,7 +22,7 @@ spec:
       serviceAccountName: grafana
       containers:
         - name: grafana
-          image: grafana/grafana
+          image: grafana/grafana:10.1.5  # Specify the version here
           ports:
             - containerPort: 3000
 ---
